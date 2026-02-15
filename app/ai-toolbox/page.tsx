@@ -1,0 +1,262 @@
+'use client';
+
+import { useState } from 'react';
+import { AITool, ToolCategory, ToolStatus, ToolPricing } from '@/lib/models';
+import * as db from '@/lib/db';
+import { useProductivity } from '@/hooks/useVibeCode';
+
+const CATEGORIES: ToolCategory[] = ['Agent', 'Coding', 'Automation', 'Design', 'Writing', 'DevOps', 'Other'];
+const STATUSES: ToolStatus[] = ['Discovered', 'Testing', 'Reviewed', 'Published'];
+const PRICING: ToolPricing[] = ['Free', 'Freemium', 'Paid'];
+
+export default function AIToolboxPage() {
+    const { aiTools: tools, loadAll } = useProductivity();
+    // Note: loadAll refreshes everything. We might want a specific loadTools, but loadAll works.
+
+    const [filterCategory, setFilterCategory] = useState<ToolCategory | 'All'>('All');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTool, setEditingTool] = useState<AITool | null>(null);
+
+    const filteredTools = filterCategory === 'All'
+        ? tools
+        : tools.filter(t => t.category === filterCategory);
+
+    const handleSaveTool = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+
+        const newTool: AITool = {
+            id: editingTool?.id || '',
+            name: formData.get('name') as string,
+            official_url: formData.get('official_url') as string,
+            category: formData.get('category') as ToolCategory,
+            pricing: formData.get('pricing') as ToolPricing,
+            rating: parseInt(formData.get('rating') as string) || 0,
+            status: formData.get('status') as ToolStatus,
+            tested: formData.get('tested') === 'on',
+            review_written: formData.get('review_written') === 'on',
+            blog_published: formData.get('blog_published') === 'on',
+            social_post_published: formData.get('social_post_published') === 'on',
+            notes: formData.get('notes') as string,
+            createdAt: editingTool?.createdAt || new Date().toISOString()
+        };
+
+        if (editingTool) {
+            await db.updateAITool(newTool);
+        } else {
+            // @ts-ignore
+            delete newTool.id;
+            await db.addAITool(newTool as AITool);
+        }
+
+        setIsModalOpen(false);
+        setEditingTool(null);
+        loadAll();
+    };
+
+    const updateStatus = async (tool: AITool, newStatus: ToolStatus) => {
+        await db.updateAITool({ ...tool, status: newStatus });
+        loadAll();
+    };
+
+    const toggleLifecycle = async (tool: AITool, field: keyof Pick<AITool, 'tested' | 'review_written' | 'blog_published' | 'social_post_published'>) => {
+        const updated = { ...tool, [field]: !tool[field] };
+
+        // Automation: If marked as Tested, auto-create tasks
+        if (field === 'tested' && updated.tested && !tool.tested) {
+            // We need to add tasks via DB
+            const today = new Date().toISOString().split('T')[0];
+            await db.addTask({
+                id: '', // let db gen
+                title: `Write Review: ${tool.name}`,
+                category: 'AINews',
+                priority: 'high',
+                completed: false,
+                isSubTask: false,
+                date: today,
+                createdAt: new Date().toISOString()
+            } as any); // cast to avoid ID issue if any
+
+            await db.addTask({
+                id: '',
+                title: `Create Social Post: ${tool.name}`,
+                category: 'OnlinePresence',
+                priority: 'medium',
+                completed: false,
+                isSubTask: false,
+                date: today,
+                createdAt: new Date().toISOString()
+            } as any);
+
+            updated.status = 'Testing';
+        }
+
+        await db.updateAITool(updated);
+        loadAll();
+    };
+
+    return (
+        <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen">
+            <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl font-black tracking-tight text-[hsl(var(--text-primary))]">
+                        AI Tools <span className="text-[hsl(var(--primary))]">v1</span>
+                    </h1>
+                    <p className="text-[hsl(var(--text-secondary))] font-medium mt-2">
+                        Curated Arsenal. Test, Review, Dominate.
+                    </p>
+                </div>
+                <button
+                    onClick={() => { setEditingTool(null); setIsModalOpen(true); }}
+                    className="flex items-center gap-2 px-6 py-3 bg-[hsl(var(--primary))] text-white rounded-xl font-bold hover:shadow-lg hover:shadow-[hsl(var(--primary))]/20 hover:-translate-y-1 transition-all"
+                >
+                    + Add Tool
+                </button>
+            </header>
+
+            {/* Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-4 mb-8 custom-scrollbar">
+                {(['All', ...CATEGORIES] as const).map(cat => (
+                    <button
+                        key={cat}
+                        onClick={() => setFilterCategory(cat)}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${filterCategory === cat
+                            ? 'bg-[hsl(var(--primary))] text-white border-[hsl(var(--primary))]'
+                            : 'bg-[hsl(var(--card-bg))] border-[hsl(var(--border-color))] hover:border-[hsl(var(--text-muted))]'
+                            }`}
+                    >
+                        {cat}
+                    </button>
+                ))}
+            </div>
+
+            {/* Tools Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredTools.map(tool => (
+                    <div key={tool.id} className="bg-[hsl(var(--card-bg))] border border-[hsl(var(--border-color))] rounded-3xl p-6 hover:shadow-xl transition-all group relative">
+                        <div className="flex justify-between items-start mb-4">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 px-2 py-1 rounded">
+                                {tool.category}
+                            </span>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider ${tool.pricing === 'Free' ? 'text-green-500' : tool.pricing === 'Paid' ? 'text-red-500' : 'text-orange-500'
+                                }`}>
+                                {tool.pricing}
+                            </span>
+                        </div>
+
+                        <h3 className="text-2xl font-black tracking-tight mb-2 flex items-center gap-2">
+                            {tool.name}
+                            <a href={tool.official_url} target="_blank" className="text-[hsl(var(--text-muted))] hover:text-[hsl(var(--primary))]">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
+                        </h3>
+
+                        {/* Rating */}
+                        <div className="flex gap-1 mb-4 text-xs text-yellow-500">
+                            {[1, 2, 3, 4, 5].map(star => (
+                                <span key={star}>{star <= tool.rating ? '★' : '☆'}</span>
+                            ))}
+                        </div>
+
+                        {/* Lifecycle */}
+                        <div className="space-y-2 mb-6 bg-[hsl(var(--bg-dark))] p-4 rounded-xl">
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--text-muted))] mb-2">Lifecycle</div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={() => toggleLifecycle(tool, 'tested')}
+                                    className={`text-[10px] font-bold px-2 py-1 rounded border transition-all ${tool.tested ? 'bg-green-500/20 border-green-500/50 text-green-500' : 'border-[hsl(var(--border-color))] text-[hsl(var(--text-muted))]'}`}
+                                >
+                                    {tool.tested ? '✓ Tested' : '○ Tested'}
+                                </button>
+                                <button
+                                    onClick={() => toggleLifecycle(tool, 'review_written')}
+                                    className={`text-[10px] font-bold px-2 py-1 rounded border transition-all ${tool.review_written ? 'bg-blue-500/20 border-blue-500/50 text-blue-500' : 'border-[hsl(var(--border-color))] text-[hsl(var(--text-muted))]'}`}
+                                >
+                                    {tool.review_written ? '✓ Reviewed' : '○ Reviewed'}
+                                </button>
+                                <button
+                                    onClick={() => toggleLifecycle(tool, 'blog_published')}
+                                    className={`text-[10px] font-bold px-2 py-1 rounded border transition-all ${tool.blog_published ? 'bg-purple-500/20 border-purple-500/50 text-purple-500' : 'border-[hsl(var(--border-color))] text-[hsl(var(--text-muted))]'}`}
+                                >
+                                    {tool.blog_published ? '✓ Blogged' : '○ Blogged'}
+                                </button>
+                                <button
+                                    onClick={() => toggleLifecycle(tool, 'social_post_published')}
+                                    className={`text-[10px] font-bold px-2 py-1 rounded border transition-all ${tool.social_post_published ? 'bg-pink-500/20 border-pink-500/50 text-pink-500' : 'border-[hsl(var(--border-color))] text-[hsl(var(--text-muted))]'}`}
+                                >
+                                    {tool.social_post_published ? '✓ Posted' : '○ Posted'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Footer Actions */}
+                        <div className="flex justify-between items-center pt-4 border-t border-[hsl(var(--border-color))]">
+                            <select
+                                value={tool.status}
+                                onChange={(e) => updateStatus(tool, e.target.value as ToolStatus)}
+                                className="bg-transparent text-xs font-bold text-[hsl(var(--text-secondary))] outline-none cursor-pointer hover:text-[hsl(var(--primary))]"
+                            >
+                                {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <button
+                                onClick={() => { setEditingTool(tool); setIsModalOpen(true); }}
+                                className="text-xs font-bold text-[hsl(var(--text-muted))] hover:text-[hsl(var(--primary))]"
+                            >
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-[hsl(var(--card-bg))] border border-[hsl(var(--border-color))] w-full max-w-lg rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+                        <h2 className="text-2xl font-black mb-6">{editingTool ? 'Edit Tool' : 'Add AI Tool'}</h2>
+                        <form onSubmit={handleSaveTool} className="space-y-4">
+                            <input name="name" required defaultValue={editingTool?.name} className="input-field" placeholder="Tool Name" />
+                            <input name="official_url" defaultValue={editingTool?.official_url} className="input-field" placeholder="Official URL" />
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <select name="category" defaultValue={editingTool?.category || 'Agent'} className="input-field">
+                                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                                <select name="pricing" defaultValue={editingTool?.pricing || 'Freemium'} className="input-field">
+                                    {PRICING.map(p => <option key={p} value={p}>{p}</option>)}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[hsl(var(--text-muted))]">Rating (1-5)</label>
+                                <input name="rating" type="number" min="1" max="5" defaultValue={editingTool?.rating || 0} className="input-field mt-1" />
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[hsl(var(--text-muted))]">Status</label>
+                                <select name="status" defaultValue={editingTool?.status || 'Discovered'} className="input-field mt-1">
+                                    {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </div>
+
+                            <textarea name="notes" defaultValue={editingTool?.notes} className="input-field min-h-[100px]" placeholder="Key features, pros/cons..." />
+
+                            {/* Checkboxes for lifecycle (mostly for initial add) */}
+                            <div className="grid grid-cols-2 gap-2 text-sm pt-2">
+                                <label className="flex items-center gap-2"><input type="checkbox" name="tested" defaultChecked={editingTool?.tested} /> Tested</label>
+                                <label className="flex items-center gap-2"><input type="checkbox" name="review_written" defaultChecked={editingTool?.review_written} /> Review Written</label>
+                                <label className="flex items-center gap-2"><input type="checkbox" name="blog_published" defaultChecked={editingTool?.blog_published} /> Blog Published</label>
+                                <label className="flex items-center gap-2"><input type="checkbox" name="social_post_published" defaultChecked={editingTool?.social_post_published} /> Social Posted</label>
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-xl font-bold hover:bg-white/5 transition-colors">Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-[hsl(var(--primary))] text-white rounded-xl font-bold flex-1">Save Tool</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

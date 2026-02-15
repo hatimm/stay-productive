@@ -1,0 +1,424 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { IntelligenceSource, CreatorRadar, DiscoveryLog, WeeklyTrend, DiscoveryCategory, DiscoveryAction, getWeekNumber } from '@/lib/models';
+import * as db from '@/lib/db';
+import { useProductivity } from '@/hooks/useVibeCode';
+
+export default function AIIntelligencePage() {
+    const { intelligenceSources: sources, discoveryLogs: logs, loadAll } = useProductivity();
+    const [radar, setRadar] = useState<CreatorRadar[]>([]);
+    const [trend, setTrend] = useState<WeeklyTrend | null>(null);
+
+    const currentYear = new Date().getFullYear();
+    const currentWeek = getWeekNumber();
+
+    // Load Extras
+    useEffect(() => {
+        async function loadExtras() {
+            const r = await db.fetchCreatorRadar();
+            setRadar(r);
+            const t = await db.fetchWeeklyTrend(currentWeek, currentYear);
+            if (t) setTrend(t);
+        }
+        loadExtras();
+    }, [currentWeek, currentYear]);
+
+    // Form States
+    const [showSourceModal, setShowSourceModal] = useState(false);
+    const [showRadarModal, setShowRadarModal] = useState(false);
+
+    // Log Form Terminology Simplified
+    const [logTitle, setLogTitle] = useState('');
+    const [logLink, setLogLink] = useState('');
+    const [logSummary, setLogSummary] = useState('');
+    const [logCategory, setLogCategory] = useState<DiscoveryCategory>('Tool');
+    const [logAction, setLogAction] = useState<DiscoveryAction>('Test Tool');
+
+    const handleAddSource = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const newSource: IntelligenceSource = {
+            id: '',
+            name: formData.get('name') as string,
+            url: formData.get('url') as string,
+            description: formData.get('description') as string,
+            checkedThisWeek: false,
+            lastResetDate: new Date().toISOString()
+        };
+
+        // @ts-ignore
+        delete newSource.id;
+        await db.addIntelligenceSource(newSource as IntelligenceSource);
+        setShowSourceModal(false);
+        loadAll();
+    };
+
+    const handleToggleSource = async (source: IntelligenceSource) => {
+        await db.updateIntelligenceSource({ ...source, checkedThisWeek: !source.checkedThisWeek });
+        loadAll();
+    };
+
+    const handleAddRadar = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const newRadar: CreatorRadar = {
+            id: '',
+            name: formData.get('name') as string,
+            platform: formData.get('platform') as any,
+            topic: formData.get('topic') as string,
+            notes: '',
+            status: 'Active'
+        };
+
+        // @ts-ignore
+        delete newRadar.id;
+        await db.addCreatorRadar(newRadar as CreatorRadar);
+        setShowRadarModal(false);
+
+        const r = await db.fetchCreatorRadar();
+        setRadar(r);
+    };
+
+    const handleLogDiscovery = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const newLog: DiscoveryLog = {
+            id: '',
+            title: logTitle,
+            link: logLink,
+            summary: logSummary,
+            category: logCategory,
+            actionRequired: logAction,
+            createdAt: new Date().toISOString()
+        };
+
+        // @ts-ignore
+        delete newLog.id;
+        await db.addDiscoveryLog(newLog as DiscoveryLog);
+
+        const today = new Date().toISOString().split('T')[0];
+
+        if (logAction === 'Test Tool') {
+            await db.addAITool({
+                id: '',
+                name: logTitle,
+                official_url: logLink,
+                category: 'Other',
+                pricing: 'Freemium',
+                rating: 0,
+                status: 'Discovered',
+                tested: false,
+                review_written: false,
+                blog_published: false,
+                social_post_published: false,
+                notes: logSummary,
+                createdAt: new Date().toISOString()
+            } as any);
+        } else if (logAction === 'Monitor') {
+            await db.addTask({
+                id: '',
+                title: `Monitor: ${logTitle}`,
+                category: 'AINews',
+                priority: 'medium',
+                completed: false,
+                isSubTask: false,
+                date: today,
+                createdAt: new Date().toISOString()
+            } as any);
+        }
+
+        setLogTitle('');
+        setLogLink('');
+        setLogSummary('');
+        loadAll();
+    };
+
+    const handleSaveTrend = async () => {
+        if (!trend) {
+            const newTrend: WeeklyTrend = {
+                id: '',
+                weekNumber: currentWeek,
+                year: currentYear,
+                synthesis: 'Emerging patterns...',
+                topTools: [],
+                actionItems: []
+            };
+            // @ts-ignore
+            delete newTrend.id;
+            await db.saveWeeklyTrend(newTrend as WeeklyTrend);
+            const t = await db.fetchWeeklyTrend(currentWeek, currentYear);
+            if (t) setTrend(t);
+        } else {
+            await db.saveWeeklyTrend(trend);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-[hsl(var(--bg-darker))]">
+            {/* Subtle Backdrop Animation */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-10 dark:opacity-20">
+                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[hsl(var(--primary))] blur-[150px] rounded-full animate-pulse" />
+                <div className="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-[hsl(var(--accent))] blur-[130px] rounded-full animate-pulse" style={{ animationDelay: '3s' }} />
+            </div>
+
+            <div className="relative p-6 md:p-10 max-w-[1600px] mx-auto space-y-10">
+                {/* Header Section */}
+                <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--primary))] animate-ping" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--primary))] opacity-70">Live Tracker</span>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                            AI News & <span className="text-gradient">Tools</span>
+                        </h1>
+                        <p className="text-[hsl(var(--text-secondary))] font-medium text-lg max-w-xl">
+                            The best way to track findings and tools in the fast-moving AI space.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="px-6 py-4 rounded-2xl bg-[hsl(var(--card-bg))]/40 backdrop-blur-md border border-[hsl(var(--border-color))] flex gap-8 items-center">
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-black text-[hsl(var(--primary))]">{sources.length}</span>
+                                <span className="text-[10px] uppercase font-bold opacity-40">Trusted Sites</span>
+                            </div>
+                            <div className="w-px h-8 bg-[hsl(var(--border-color))]" />
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-black text-[hsl(var(--accent))]">{logs.length}</span>
+                                <span className="text-[10px] uppercase font-bold opacity-40">Total Findings</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                    {/* LEFT SIDE: Input & Feed */}
+                    <div className="lg:col-span-8 space-y-8">
+
+                        {/* New Finding Form */}
+                        <div className="card p-8 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14M5 12h14" /></svg>
+                            </div>
+                            <h2 className="text-xl font-black mb-6 flex items-center gap-2 italic">
+                                Add New Finding
+                            </h2>
+                            <form onSubmit={handleLogDiscovery} className="space-y-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Title</label>
+                                        <input value={logTitle} onChange={e => setLogTitle(e.target.value)} placeholder="Name of tool or news..." className="input-field bg-white/5" required />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">URL / Link</label>
+                                        <input value={logLink} onChange={e => setLogLink(e.target.value)} placeholder="https://..." className="input-field bg-white/5" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Short Description</label>
+                                    <textarea value={logSummary} onChange={e => setLogSummary(e.target.value)} placeholder="Why is this important? What does it do?" className="input-field bg-white/5 min-h-[100px]" />
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Category</label>
+                                        <select value={logCategory} onChange={e => setLogCategory(e.target.value as any)} className="input-field bg-white/5">
+                                            <option value="Tool">Tool</option>
+                                            <option value="News">News</option>
+                                            <option value="Tutorial">Tutorial</option>
+                                            <option value="Paper">Research Paper</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1.5 col-span-1 md:col-span-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Next Step</label>
+                                        <select value={logAction} onChange={e => setLogAction(e.target.value as any)} className="input-field bg-[hsl(var(--primary))]/5 border-[hsl(var(--primary))]/20 text-[hsl(var(--primary))] font-black">
+                                            <option value="Test Tool">Try it out myself</option>
+                                            <option value="Monitor">Keep an eye on this</option>
+                                            <option value="Ignore">Just archive for later</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" className="w-full btn-primary py-4 font-black text-lg tracking-widest shadow-xl shadow-[hsl(var(--primary))]/20 ring-1 ring-white/10 uppercase">Save Finding</button>
+                            </form>
+                        </div>
+
+                        {/* Recent Findings List */}
+                        <div className="space-y-4">
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em] opacity-40 ml-1">Recent Updates</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {logs.slice(0, 8).map(log => (
+                                    <div key={log.id} className="p-5 rounded-2xl bg-[hsl(var(--card-bg))]/40 backdrop-blur-md border border-[hsl(var(--border-color))] hover:border-[hsl(var(--primary))]/40 hover:shadow-lg transition-all group relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-1 h-full bg-[hsl(var(--primary))]/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <div className="flex justify-between items-start mb-3">
+                                            <span className="px-2 py-0.5 rounded bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-[9px] font-black uppercase tracking-widest">
+                                                {log.category}
+                                            </span>
+                                            <span className="text-[9px] font-bold opacity-30">{new Date(log.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                        <h3 className="font-bold text-[hsl(var(--text-primary))] group-hover:text-[hsl(var(--primary))] transition-colors mb-2 line-clamp-1">
+                                            {log.link ? <a href={log.link} target="_blank" className="hover:underline flex items-center gap-1">
+                                                {log.title} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                                            </a> : log.title}
+                                        </h3>
+                                        <p className="text-xs text-[hsl(var(--text-secondary))] line-clamp-2 leading-relaxed opacity-80">{log.summary}</p>
+                                    </div>
+                                ))}
+                                {logs.length === 0 && (
+                                    <div className="col-span-full py-12 text-center opacity-20 border-2 border-dashed border-[hsl(var(--border-color))] rounded-3xl">
+                                        <p className="font-bold uppercase tracking-widest text-xs">No findings yet. Start tracking above!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* RIGHT SIDE: Summary & Reference */}
+                    <div className="lg:col-span-4 space-y-8">
+
+                        {/* Weekly Summary Notepad */}
+                        <div className="card p-8 border-t-4 border-t-[hsl(var(--accent))] bg-gradient-to-b from-[hsl(var(--card-bg))]/80 to-[hsl(var(--bg-dark))]/20">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 className="text-xl font-black italic">Weekly Summary</h2>
+                                    <p className="text-[9px] font-bold opacity-30 uppercase tracking-widest mt-1">Week {currentWeek} • {currentYear}</p>
+                                </div>
+                                <button onClick={handleSaveTrend} className="px-5 py-2 bg-[hsl(var(--accent))] text-white rounded-xl text-[10px] font-black shadow-lg shadow-[hsl(var(--accent))]/20 hover:scale-105 transition-transform">
+                                    SAVE NOTES
+                                </button>
+                            </div>
+                            <textarea
+                                value={trend?.synthesis || ''}
+                                onChange={(e) => setTrend(prev => prev ? { ...prev, synthesis: e.target.value } : {
+                                    id: '', weekNumber: currentWeek, year: currentYear, synthesis: e.target.value, topTools: [], actionItems: []
+                                })}
+                                placeholder="What are the biggest patterns you noticed this week? Any specific tools winning the race?"
+                                className="w-full bg-white/5 border border-[hsl(var(--border-color))] rounded-2xl p-5 min-h-[280px] text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent))]/30 transition-all font-medium custom-scrollbar"
+                            />
+                        </div>
+
+                        {/* Resource Sidebar */}
+                        <div className="space-y-6">
+
+                            {/* Trusted Sites */}
+                            <div className="card p-6 ring-1 ring-white/5">
+                                <div className="flex justify-between items-center mb-5">
+                                    <h3 className="text-sm font-black uppercase tracking-widest opacity-60">Trusted Sites</h3>
+                                    <button onClick={() => setShowSourceModal(true)} className="w-8 h-8 flex items-center justify-center bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] rounded-xl hover:scale-110 transition-transform">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14" /></svg>
+                                    </button>
+                                </div>
+                                <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                                    {sources.map(source => (
+                                        <div
+                                            key={source.id}
+                                            onClick={() => handleToggleSource(source)}
+                                            className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${source.checkedThisWeek
+                                                    ? 'bg-green-500/5 border-green-500/10 opacity-50 grayscale'
+                                                    : 'bg-[hsl(var(--bg-dark))] border-[hsl(var(--border-color))]'
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-2 h-2 rounded-full ${source.checkedThisWeek ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`} />
+                                                <span className={`text-xs font-bold ${source.checkedThisWeek ? 'line-through' : ''}`}>{source.name}</span>
+                                            </div>
+                                            <a href={source.url} target="_blank" onClick={e => e.stopPropagation()} className="opacity-30 hover:opacity-100 hover:text-[hsl(var(--primary))] transition-all">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* People to Watch */}
+                            <div className="card p-6 bg-[hsl(var(--primary))]/5 border-[hsl(var(--primary))]/10">
+                                <div className="flex justify-between items-center mb-5">
+                                    <h3 className="text-sm font-black uppercase tracking-widest opacity-60">People to Watch</h3>
+                                    <button onClick={() => setShowRadarModal(true)} className="text-[10px] font-black px-3 py-1 bg-white/10 rounded-lg hover:bg-white/20 transition-colors uppercase">Add Person</button>
+                                </div>
+                                <div className="space-y-3">
+                                    {radar.map(r => (
+                                        <div key={r.id} className="flex items-center justify-between p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-xs">
+                                                    {r.platform === 'X' ? '𝕏' : r.platform === 'YouTube' ? '▶' : '•'}
+                                                </span>
+                                                <span className="text-xs font-bold">{r.name}</span>
+                                            </div>
+                                            <span className="text-[8px] font-black opacity-40 uppercase">{r.topic}</span>
+                                        </div>
+                                    ))}
+                                    {radar.length === 0 && <p className="text-[10px] text-center opacity-30 italic py-4">No people tracked yet.</p>}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Simple Modals */}
+            {showSourceModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                    <div className="card p-10 w-full max-w-md border-2 border-[hsl(var(--primary))]/30">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-2xl font-black italic tracking-tight">Add Trusted Site</h3>
+                            <button onClick={() => setShowSourceModal(false)} className="opacity-40 hover:opacity-100"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+                        </div>
+                        <form onSubmit={handleAddSource} className="space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Name</label>
+                                <input name="name" placeholder="E.g. TLDR Crypto" className="input-field" required />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Link</label>
+                                <input name="url" placeholder="https://..." className="input-field" required />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Brief Note</label>
+                                <input name="description" placeholder="What is this site for?" className="input-field" />
+                            </div>
+                            <button type="submit" className="w-full btn-primary py-4 rounded-xl font-black tracking-widest uppercase">Add Site</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showRadarModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                    <div className="card p-10 w-full max-w-md border-2 border-[hsl(var(--accent))]/30">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-2xl font-black italic tracking-tight">Add Person to Watch</h3>
+                            <button onClick={() => setShowRadarModal(false)} className="opacity-40 hover:opacity-100"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
+                        </div>
+                        <form onSubmit={handleAddRadar} className="space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Name</label>
+                                <input name="name" placeholder="Creator Name" className="input-field" required />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Platform</label>
+                                    <select name="platform" className="input-field">
+                                        <option value="X">𝕏 / Twitter</option>
+                                        <option value="YouTube">YouTube</option>
+                                        <option value="LinkedIn">LinkedIn</option>
+                                        <option value="Blog">Personal Blog</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Main Topic</label>
+                                    <input name="topic" placeholder="e.g. LLMs" className="input-field" required />
+                                </div>
+                            </div>
+                            <button type="submit" className="w-full bg-[hsl(var(--accent))] text-white py-4 rounded-xl font-black tracking-widest uppercase">Start Watching</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
