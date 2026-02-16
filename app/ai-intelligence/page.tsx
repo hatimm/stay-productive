@@ -133,51 +133,53 @@ export default function AIIntelligencePage() {
                     </p>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                    {/* LEFT: Resources Sidebar (4 cols) */}
-                    <aside className="lg:col-span-4 space-y-6">
-                        <div className="flex items-center justify-between px-2">
-                            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[hsl(var(--text-primary))]">Resources to Check</h2>
-                            <button
-                                onClick={() => setShowSourceModal(true)}
-                                className="w-10 h-10 rounded-xl bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/20 flex items-center justify-center hover:bg-[hsl(var(--primary))]/20 hover:scale-105 active:scale-95 transition-all text-[hsl(var(--primary))]"
-                                title="Add New Resource"
+                {/* TOP: Resources Ticker */}
+                <section className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[hsl(var(--text-primary))] flex items-center gap-2">
+                            <span className="text-xl">📡</span> Resources to Check
+                        </h2>
+                        <button
+                            onClick={() => setShowSourceModal(true)}
+                            className="w-8 h-8 rounded-lg bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/20 flex items-center justify-center hover:bg-[hsl(var(--primary))]/20 hover:scale-105 active:scale-95 transition-all text-[hsl(var(--primary))]"
+                            title="Add New Resource"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        </button>
+                    </div>
+
+                    <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
+                        {sources.map(source => (
+                            <div
+                                key={source.id}
+                                className={`snap-start shrink-0 w-[280px] group card p-4 border transition-all cursor-pointer flex items-center justify-between ${source.checkedThisWeek
+                                    ? 'border-green-500/20 bg-green-500/5 opacity-50'
+                                    : 'border-[hsl(var(--border-color))] hover:border-[hsl(var(--primary))]/30 bg-[hsl(var(--card-bg))]'
+                                    }`}
+                                onClick={() => handleToggleSource(source)}
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-3">
-                            {sources.map(source => (
-                                <div
-                                    key={source.id}
-                                    className={`group card p-4 border transition-all cursor-pointer flex items-center justify-between ${source.checkedThisWeek
-                                        ? 'border-green-500/20 bg-green-500/5 opacity-40'
-                                        : 'border-[hsl(var(--border-color))] hover:border-[hsl(var(--primary))]/30'
-                                        }`}
-                                    onClick={() => handleToggleSource(source)}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-3 h-3 rounded-full border-2 ${source.checkedThisWeek ? 'bg-green-500 border-green-500' : 'bg-transparent border-[hsl(var(--border-color))]'
-                                            }`} />
-                                        <div className="flex flex-col">
-                                            <span className="font-bold text-[hsl(var(--text-primary))]">{source.name}</span>
-                                            <span className="text-[10px] opacity-60 text-[hsl(var(--text-secondary))]">{source.description || 'Resource'}</span>
-                                        </div>
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                    <div className={`w-2.5 h-2.5 shrink-0 rounded-full border-2 ${source.checkedThisWeek ? 'bg-green-500 border-green-500' : 'bg-transparent border-[hsl(var(--border-color))]'
+                                        }`} />
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="font-bold text-sm text-[hsl(var(--text-primary))] truncate">{source.name}</span>
+                                        <span className="text-[9px] opacity-60 text-[hsl(var(--text-secondary))] truncate">{source.description || 'Resource'}</span>
                                     </div>
-                                    <a href={source.url} target="_blank" onClick={e => e.stopPropagation()} className="p-2 opacity-20 hover:opacity-100 hover:text-[hsl(var(--primary))] text-[hsl(var(--text-primary))]">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
-                                    </a>
                                 </div>
-                            ))}
-                        </div>
-                    </aside>
+                                <a href={source.url} target="_blank" onClick={e => e.stopPropagation()} className="p-1.5 opacity-20 hover:opacity-100 hover:text-[hsl(var(--primary))] text-[hsl(var(--text-primary))] transition-opacity">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+                </section>
 
-                    {/* RIGHT: Input Column (8 cols) */}
-                    <main className="lg:col-span-8 space-y-10">
+                {/* MAIN GRID: 2 Columns */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-                        {/* 1. TOOL FORM (Structured Card Style) */}
-                        <div className="card p-8 border-2 border-[hsl(var(--primary))]/5 shadow-lg relative overflow-hidden group bg-[hsl(var(--card-bg))]">
+                    {/* LEFT COLUMN: Tool Capture */}
+                    <div className="space-y-8">
+                        <div className="card p-8 border-2 border-[hsl(var(--primary))]/5 shadow-lg relative overflow-hidden group bg-[hsl(var(--card-bg))] h-full">
                             <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none group-focus-within:opacity-[0.08] transition-opacity">
                                 <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M12 2v20M2 12h20M5.3 5.3l13.4 13.4M5.3 18.7L18.7 5.3" /></svg>
                             </div>
@@ -187,26 +189,24 @@ export default function AIIntelligencePage() {
                             </h2>
 
                             <form onSubmit={handleAddTool} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-1 text-[hsl(var(--text-secondary))]">Tool Name</label>
-                                        <input
-                                            value={toolName}
-                                            onChange={e => setToolName(e.target.value)}
-                                            placeholder="e.g. Cursor, v0.dev..."
-                                            className="input-field text-[hsl(var(--text-primary))]"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-1 text-[hsl(var(--text-secondary))]">Official URL</label>
-                                        <input
-                                            value={toolLink}
-                                            onChange={e => setToolLink(e.target.value)}
-                                            placeholder="https://..."
-                                            className="input-field text-[hsl(var(--text-primary))]"
-                                        />
-                                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-1 text-[hsl(var(--text-secondary))]">Tool Name</label>
+                                    <input
+                                        value={toolName}
+                                        onChange={e => setToolName(e.target.value)}
+                                        placeholder="e.g. Cursor, v0.dev..."
+                                        className="input-field text-[hsl(var(--text-primary))]"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-1 text-[hsl(var(--text-secondary))]">Official URL</label>
+                                    <input
+                                        value={toolLink}
+                                        onChange={e => setToolLink(e.target.value)}
+                                        placeholder="https://..."
+                                        className="input-field text-[hsl(var(--text-primary))]"
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
@@ -215,7 +215,7 @@ export default function AIIntelligencePage() {
                                         value={toolNotes}
                                         onChange={e => setToolNotes(e.target.value)}
                                         placeholder="Quick notes on what it does..."
-                                        className="input-field min-h-[80px] text-sm py-4 text-[hsl(var(--text-primary))]"
+                                        className="input-field min-h-[120px] text-sm py-4 text-[hsl(var(--text-primary))]"
                                     />
                                 </div>
 
@@ -228,10 +228,13 @@ export default function AIIntelligencePage() {
                                 </button>
                             </form>
                         </div>
+                    </div>
 
-                        {/* 2. NEWS FORM (Section below Tool) */}
-                        <div className="card p-8 border border-[hsl(var(--border-color))] bg-[hsl(var(--card-bg))] shadow-sm">
-                            <h2 className="text-lg font-black mb-6 flex items-center gap-3 text-[hsl(var(--text-primary))]">
+                    {/* RIGHT COLUMN: News & History */}
+                    <div className="space-y-8">
+                        {/* News Form */}
+                        <div className="card p-6 border border-[hsl(var(--border-color))] bg-[hsl(var(--card-bg))] shadow-sm">
+                            <h2 className="text-lg font-black mb-4 flex items-center gap-3 text-[hsl(var(--text-primary))]">
                                 <span className="text-xl">📰</span> Note News Item
                             </h2>
                             <form onSubmit={handleAddNews} className="space-y-4">
@@ -239,14 +242,14 @@ export default function AIIntelligencePage() {
                                     value={newsText}
                                     onChange={e => setNewsText(e.target.value)}
                                     placeholder="Paste important AI news or findings here..."
-                                    className="input-field min-h-[140px] text-sm py-4 text-[hsl(var(--text-primary))] resize-none"
+                                    className="input-field min-h-[100px] text-sm py-3 text-[hsl(var(--text-primary))] resize-none"
                                     required
                                 />
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="px-8 py-3 btn-primary font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all text-white"
+                                        className="px-6 py-2 btn-primary font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all text-white rounded-lg"
                                     >
                                         Save News
                                     </button>
@@ -255,31 +258,31 @@ export default function AIIntelligencePage() {
                         </div>
 
                         {/* Recent History Feed */}
-                        <div className="space-y-6 pt-4">
+                        <div className="space-y-4">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 px-2 text-[hsl(var(--text-secondary))]">Recent Entries</h3>
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
                                 {logs.map(log => {
                                     const isTool = log.category === 'Tool';
                                     return (
-                                        <div key={log.id} className={`card p-5 border transition-all ${isTool ? 'border-[hsl(var(--primary))]/10 bg-[hsl(var(--primary))]/5' : 'border-[hsl(var(--border-color))]'}`}>
-                                            <div className="flex items-start gap-4">
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${isTool ? 'bg-[hsl(var(--primary))]/10' : 'bg-[hsl(var(--bg-dark))]'}`}>
+                                        <div key={log.id} className={`card p-4 border transition-all ${isTool ? 'border-[hsl(var(--primary))]/10 bg-[hsl(var(--primary))]/5' : 'border-[hsl(var(--border-color))]'}`}>
+                                            <div className="flex items-start gap-3">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0 ${isTool ? 'bg-[hsl(var(--primary))]/10' : 'bg-[hsl(var(--bg-dark))]'}`}>
                                                     {isTool ? '🧰' : '📰'}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${isTool ? 'bg-[hsl(var(--primary))]/20 text-[hsl(var(--primary))]' : 'bg-[hsl(var(--bg-dark))] text-[hsl(var(--text-secondary))]'}`}>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${isTool ? 'bg-[hsl(var(--primary))]/20 text-[hsl(var(--primary))]' : 'bg-[hsl(var(--bg-dark))] text-[hsl(var(--text-secondary))]'}`}>
                                                             {log.category}
                                                         </span>
                                                         <span className="text-[8px] font-bold opacity-40 text-[hsl(var(--text-muted))]">{new Date(log.createdAt).toLocaleDateString()}</span>
                                                     </div>
-                                                    <h4 className="font-bold text-base text-[hsl(var(--text-primary))] truncate">
+                                                    <h4 className="font-bold text-sm text-[hsl(var(--text-primary))] truncate">
                                                         {log.link ? <a href={log.link} target="_blank" className="hover:underline flex items-center gap-2">
                                                             {log.title}
                                                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-30"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
                                                         </a> : log.title}
                                                     </h4>
-                                                    <p className="text-xs opacity-70 text-[hsl(var(--text-secondary))] truncate mt-0.5">{log.summary}</p>
+                                                    <p className="text-[11px] opacity-70 text-[hsl(var(--text-secondary))] truncate mt-0.5 max-w-[95%]">{log.summary}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -287,7 +290,7 @@ export default function AIIntelligencePage() {
                                 })}
                             </div>
                         </div>
-                    </main>
+                    </div>
                 </div>
             </div>
 
