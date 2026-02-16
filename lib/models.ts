@@ -152,7 +152,7 @@ export interface CreatorRadar {
     lastReviewedDate?: string;
 }
 
-export type DiscoveryCategory = 'Tool' | 'Research' | 'Trend';
+export type DiscoveryCategory = 'Tool' | 'News' | 'Research' | 'Trend' | 'Tutorial';
 export type DiscoveryAction = 'Test Tool' | 'Write Blog' | 'Make Post' | 'Monitor' | 'Ignore';
 
 export interface DiscoveryLog {
