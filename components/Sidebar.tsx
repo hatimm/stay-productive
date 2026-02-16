@@ -22,7 +22,7 @@ export default function Sidebar() {
 
     return (
         <aside className="fixed left-0 top-0 h-screen w-64 bg-[hsl(var(--card-bg))] border-r border-[hsl(var(--border-color))] flex flex-col z-40 transition-all hidden md:flex shadow-sm">
-            <div className="p-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--secondary))] flex items-center justify-center text-white shadow-lg shadow-[hsl(var(--primary))]/20">
                         <span className="text-xl font-bold">V</span>

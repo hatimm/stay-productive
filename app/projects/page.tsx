@@ -41,7 +41,7 @@ export default function ProjectsPage() {
         if (editingProject) {
             await db.updateProject(newProject);
         } else {
-            // @ts-ignore - remove ID to let DB generate it
+            // @ts-expect-error - remove ID to let DB generate it
             delete newProject.id;
             await db.addProject(newProject as Project);
         }
@@ -169,7 +169,7 @@ export default function ProjectsPage() {
                                 onClick={() => handleLogCommit(project)}
                                 className="w-full py-2 bg-[hsl(var(--card-bg))] border border-[hsl(var(--border-color))] rounded-lg text-xs font-bold hover:bg-[hsl(var(--primary))] hover:text-white transition-colors"
                             >
-                                Log Today's Commit
+                                Log Today&apos;s Commit
                             </button>
                         </div>
 

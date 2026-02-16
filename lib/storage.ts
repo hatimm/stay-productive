@@ -58,7 +58,7 @@ export function getTodaysTasks(): Task[] {
     const allTasks = getAllTasks();
 
     // Check if we already have tasks for today
-    let todaysTasks = allTasks.filter(t => t.date === today);
+    const todaysTasks = allTasks.filter(t => t.date === today);
 
     if (todaysTasks.length > 0) {
         // Add note counts
@@ -347,7 +347,7 @@ export function getProjects(): Project[] {
                 ...p,
                 commit_streak: 0,
                 updatedAt: p.createdAt,
-                status: (p.status as any === 'active' ? 'In Progress' : (p.status as any === 'completed' ? 'Published' : 'Idea')) as ProjectStatus
+                status: (p.status as unknown === 'active' ? 'In Progress' : (p.status as unknown === 'completed' ? 'Published' : 'Idea')) as ProjectStatus
             };
         }
         return p;
@@ -586,7 +586,7 @@ export function logVideoMinutes(videoId: string, minutes: number): VideoProgress
     const video = DEVOPS_LEARNING_PATH.find(v => v.id === videoId);
     if (!video) throw new Error('Video not found in learning path');
 
-    let progressIndex = allProgress.findIndex(p => p.videoId === videoId);
+    const progressIndex = allProgress.findIndex(p => p.videoId === videoId);
     let progress: VideoProgress;
 
     if (progressIndex >= 0) {
@@ -1073,7 +1073,7 @@ export function getAllWeeklyTrends(): WeeklyTrend[] {
 export function saveWeeklyTrend(trend: WeeklyTrend): void {
     if (typeof window === 'undefined') return;
     const data = localStorage.getItem(STORAGE_KEYS.AI_TRENDS);
-    let all: WeeklyTrend[] = data ? JSON.parse(data) : [];
+    const all: WeeklyTrend[] = data ? JSON.parse(data) : [];
     const index = all.findIndex(t => t.weekNumber === trend.weekNumber && t.year === trend.year);
     if (index !== -1) all[index] = trend;
     else all.push(trend);

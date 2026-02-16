@@ -11,10 +11,11 @@ import * as storage from '@/lib/storage'; // Keeping for local preference (freel
 export default function Calendar() {
     const { tasks, isLoaded } = useProductivity();
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDayDetail, setSelectedDayDetail] = useState<{ date: string, tasks: any[] } | null>(null);
+    const [selectedDayDetail, setSelectedDayDetail] = useState<{ date: string, tasks: (Task & { isPlanned?: boolean })[] } | null>(null);
     const [isFreelanceMode, setIsFreelanceMode] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsFreelanceMode(storage.isFreelanceClientActive());
     }, []);
 
@@ -130,7 +131,7 @@ export default function Calendar() {
                                     </div>
 
                                     <div className="space-y-1.5 overflow-hidden flex-1">
-                                        {displayTasks.slice(0, 3).map((task: any) => (
+                                        {displayTasks.slice(0, 3).map((task: Task & { isPlanned?: boolean }) => (
                                             <div
                                                 key={task.id}
                                                 className={`text-[9px] px-2.5 py-1.5 rounded-xl flex items-center gap-2 border transition-all ${task.completed

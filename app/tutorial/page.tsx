@@ -108,7 +108,7 @@ export default function TutorialPage() {
         <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-screen">
             <header className="mb-12">
                 <h1 className="text-4xl font-black tracking-tight text-[hsl(var(--text-primary))]">
-                    Operator's Manual <span className="text-[hsl(var(--primary))]">v1</span>
+                    Operator&apos;s Manual <span className="text-[hsl(var(--primary))]">v1</span>
                 </h1>
                 <p className="text-[hsl(var(--text-secondary))] font-medium mt-2 text-lg">
                     Workflows for high-performance execution.

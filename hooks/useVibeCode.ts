@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import {
-    Task, Note, PostIdea, Lead, Project, Video, VideoProgress, AppDocument, AITool, IntelligenceSource, DiscoveryLog, DEVOPS_LEARNING_PATH,
-    WEEKLY_TEMPLATE, getTodayString, getCurrentWeekday, generateId
+    Task, Note, PostIdea, Lead, Project, VideoProgress, AppDocument, AITool, IntelligenceSource, DiscoveryLog, DEVOPS_LEARNING_PATH,
+    WEEKLY_TEMPLATE, getTodayString, getCurrentWeekday, Account
 } from '@/lib/models';
 import * as storage from '@/lib/storage';
 import * as db from '@/lib/db';
@@ -19,7 +19,7 @@ export function useProductivity() {
     const [discoveryLogs, setDiscoveryLogs] = useState<DiscoveryLog[]>([]);
     const [documents, setDocuments] = useState<AppDocument[]>([]);
     const [videoProgress, setVideoProgress] = useState<VideoProgress[]>([]);
-    const [accounts, setAccounts] = useState<any[]>([]);
+    const [accounts, setAccounts] = useState<Account[]>([]);
 
     const [isLoaded, setIsLoaded] = useState(false);
     const [isMigrating, setIsMigrating] = useState(false);
@@ -158,7 +158,7 @@ export function useProductivity() {
 
         await db.migrateData(
             rawTasks,
-            rawProjects as any,
+            rawProjects as Project[],
             rawAITools,
             rawSources,
             rawLogs,

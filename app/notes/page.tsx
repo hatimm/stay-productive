@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useProductivity } from '@/hooks/useVibeCode';
-import { NoteType, NOTE_TYPE_ICONS } from '@/lib/models';
+import { NoteType } from '@/lib/models';
 import * as db from '@/lib/db';
 
 export default function NotesPage() {

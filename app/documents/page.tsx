@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useProductivity } from '@/hooks/useVibeCode';
-import { DocumentType, DocumentLanguage, AppDocument } from '@/lib/models';
+import { DocumentType, DocumentLanguage } from '@/lib/models';
 import * as db from '@/lib/db';
 
 const DOCUMENT_SLOTS: { type: DocumentType; languages: DocumentLanguage[] }[] = [

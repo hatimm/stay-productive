@@ -1,0 +1,41 @@
+﻿
+> stay-productive@0.1.0 lint
+> eslint
+
+
+C:\Users\HatimMEFTAHI\Desktop\stay-productive\app\ai-intelligence\page.tsx
+    4:122  warning  'SocialPlatform' is defined but never used                                                                                                                     @typescript-eslint/no-unused-vars
+    4:138  warning  'ProfessionalPlatform' is defined but never used                                                                                                               @typescript-eslint/no-unused-vars
+    4:160  warning  'JobBoardPlatform' is defined but never used                                                                                                                   @typescript-eslint/no-unused-vars
+    4:178  warning  'AITool' is defined but never used                                                                                                                             @typescript-eslint/no-unused-vars
+    4:186  warning  'Task' is defined but never used                                                                                                                               @typescript-eslint/no-unused-vars
+   50:9    error    Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+   74:9    error    Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+   95:9    error    Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+  116:18   error    Unexpected any. Specify a different type                                                                                                                       @typescript-eslint/no-explicit-any
+  127:18   error    Unexpected any. Specify a different type                                                                                                                       @typescript-eslint/no-explicit-any
+
+C:\Users\HatimMEFTAHI\Desktop\stay-productive\app\ai-toolbox\page.tsx
+  47:13  error  Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer  @typescript-eslint/ban-ts-comment
+
+C:\Users\HatimMEFTAHI\Desktop\stay-productive\app\documents\page.tsx
+  5:42  warning  'AppDocument' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\HatimMEFTAHI\Desktop\stay-productive\app\login\page.tsx
+  12:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\HatimMEFTAHI\Desktop\stay-productive\app\notes\page.tsx
+  5:20  warning  'NOTE_TYPE_ICONS' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\HatimMEFTAHI\Desktop\stay-productive\app\page.tsx
+    6:9   warning  'Note' is defined but never used                        @typescript-eslint/no-unused-vars
+    7:3   warning  'PostIdea' is defined but never used                    @typescript-eslint/no-unused-vars
+    7:13  warning  'Lead' is defined but never used                        @typescript-eslint/no-unused-vars
+    7:19  warning  'Project' is defined but never used                     @typescript-eslint/no-unused-vars
+   10:67  warning  'generateId' is defined but never used                  @typescript-eslint/no-unused-vars
+   55:9   warning  'completedSubTasks' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  388:48  warning  'onViewNotes' is defined but never used                 @typescript-eslint/no-unused-vars
+  687:17  warning  'isNext' is assigned a value but never used             @typescript-eslint/no-unused-vars
+
+Ô£û 22 problems (6 errors, 16 warnings)
+

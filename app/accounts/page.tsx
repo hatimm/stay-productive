@@ -652,7 +652,7 @@ function AccountForm({ type, initialData, mode, onClose }: AccountFormProps) {
 
         const platform = currentType === 'Social' ? socialPlatform : (currentType === 'Professional' ? professionalPlatform : (currentType === 'JobBoard' ? jobBoardPlatform : undefined));
 
-        const data: any = {
+        const data: Partial<Account> = {
             name,
             type: currentType,
             platform,
@@ -669,7 +669,7 @@ function AccountForm({ type, initialData, mode, onClose }: AccountFormProps) {
         if (mode === 'edit' && initialData) {
             await db.updateAccount({ id: initialData.id, ...data });
         } else {
-            await db.addAccount({ id: crypto.randomUUID(), ...data });
+            await db.addAccount({ id: crypto.randomUUID(), ...data } as Account);
         }
         onClose();
     };

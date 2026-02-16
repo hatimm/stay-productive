@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+    // router removed
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -100,7 +99,7 @@ export default function LoginPage() {
 
                     <div className="mt-8 pt-8 border-t border-white/5 text-center">
                         <p className="text-[hsl(var(--text-secondary))] text-[11px] font-bold">
-                            Don't have an account? <a href="/signup" className="text-[hsl(var(--primary))] hover:underline">Request Access</a>
+                            Don&apos;t have an account? <a href="/signup" className="text-[hsl(var(--primary))] hover:underline">Request Access</a>
                         </p>
                     </div>
                 </div>
@@ -111,6 +110,6 @@ export default function LoginPage() {
                     </p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

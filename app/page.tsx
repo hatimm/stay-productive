@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useProductivity } from '@/hooks/useVibeCode';
 import {
-  Task, Note, NoteType,
-  PostIdea, Lead, Project,
+  Task, NoteType,
   TaskCategory, Video, VideoProgress,
   CATEGORY_STYLES, CATEGORY_ICONS, NOTE_TYPE_ICONS, DEVOPS_LEARNING_PATH,
-  formatDate, getTodayString, WEEKLY_TEMPLATE, getCurrentWeekday, generateId
+  formatDate, getTodayString, WEEKLY_TEMPLATE, getCurrentWeekday
 } from '@/lib/models';
 import * as db from '@/lib/db';
 import * as storage from '@/lib/storage'; // Keep for freelance toggle only, or move to db?
@@ -30,6 +29,7 @@ export default function Home() {
   const [migrationStatus, setMigrationStatus] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsFreelanceMode(storage.isFreelanceClientActive());
   }, []);
 
@@ -51,7 +51,6 @@ export default function Home() {
   const incompleteMainTasks = mainTasks.filter(t => !t.completed);
   const incompleteSubTasks = subTasks.filter(t => !t.completed);
   const completedMainTasks = mainTasks.filter(t => t.completed);
-  const completedSubTasks = subTasks.filter(t => t.completed);
 
   const isRoutineComplete = incompleteMainTasks.filter(t =>
     !isFreelanceMode || (t.category !== 'Freelancing' && t.category !== 'Lead')
@@ -95,7 +94,7 @@ export default function Home() {
         date: todayStr,
         isSubTask: false,
         createdAt: new Date().toISOString()
-      } as any);
+      } as Task);
     }
 
     loadTasks();
@@ -114,7 +113,7 @@ export default function Home() {
             Good Morning, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--secondary))]">Tim</span>
           </h1>
           <p className="text-[hsl(var(--text-secondary))] font-medium">
-            It's {formatDate(todayStr)}. Let's make it count.
+            It&apos;s {formatDate(todayStr)}. Let&apos;s make it count.
           </p>
         </div>
 
@@ -638,7 +637,19 @@ function NoteForm({ task, video, onClose }: { task?: Task; video?: Video; onClos
 }
 
 // DevOps Path Panel
-function DevOpsPathPanel({ onClose, refresh, openModal, videoProgress, videoStats }: any) {
+function DevOpsPathPanel({ onClose, refresh, openModal, videoProgress, videoStats }: {
+  onClose: () => void;
+  refresh: () => void;
+  openModal: (content: React.ReactNode) => void;
+  videoProgress: VideoProgress[];
+  videoStats: {
+    totalMinutes: number;
+    minutesWatched: number;
+    totalVideos: number;
+    videosCompleted: number;
+    percentage: number;
+  };
+}) {
 
   return (
     <div className="card p-10 bg-[hsl(var(--card-bg))] border border-[hsl(var(--border-color))] shadow-xl animate-in zoom-in-95 duration-500">
@@ -668,10 +679,10 @@ function DevOpsPathPanel({ onClose, refresh, openModal, videoProgress, videoStat
 
       <div className="space-y-4 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar text-left">
         {DEVOPS_LEARNING_PATH.map((video) => {
-          const progress = videoProgress.find((p: any) => p.videoId === video.id) || { minutesWatched: 0, completed: false };
+          const progress = videoProgress.find((p: VideoProgress) => p.videoId === video.id) || { videoId: video.id, minutesWatched: 0, completed: false, lastWatched: new Date().toISOString() };
 
           // Determine if next: first incomplete
-          const isNext = videoProgress.find((p: any) => p.videoId === video.id)?.completed ? false : true;
+          const isNext = videoProgress.find((p: VideoProgress) => p.videoId === video.id)?.completed ? false : true;
           // Needs better logic for "next", but for visual simple check:
           // A better "next" check is if all previous are done.
           // For now, simpler: just highlight if not done.
