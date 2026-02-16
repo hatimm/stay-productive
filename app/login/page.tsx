@@ -44,7 +44,7 @@ export default function LoginPage() {
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--secondary))] flex items-center justify-center text-white shadow-2xl shadow-[hsl(var(--primary))]/30 mb-6 group hover:scale-110 transition-transform duration-500">
                         <span className="text-3xl font-black">V</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tighter text-white mb-2 italic">
+                    <h1 className="text-4xl font-black tracking-tighter text-[hsl(var(--text-primary))] mb-2 italic">
                         VibeCode <span className="text-gradient">OS</span>
                     </h1>
                     <p className="text-[hsl(var(--text-secondary))] font-bold uppercase tracking-[0.3em] text-[10px] opacity-60">
@@ -52,8 +52,8 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <div className="card-glass p-8 md:p-10 border-2 border-white/5 shadow-2xl backdrop-blur-2xl">
-                    <h2 className="text-2xl font-black mb-8 italic tracking-tight">Login</h2>
+                <div className="card-glass p-8 md:p-10 border-2 border-[hsl(var(--border-color))] shadow-2xl backdrop-blur-2xl">
+                    <h2 className="text-2xl font-black mb-8 italic tracking-tight text-[hsl(var(--text-primary))]">Login</h2>
 
                     <form onSubmit={handleLogin} className="space-y-6">
                         {error && (
@@ -63,12 +63,12 @@ export default function LoginPage() {
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">Email Address</label>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--text-secondary))] opacity-60 ml-1">Email Address</label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="input-field bg-white/5 border-white/10 focus:border-[hsl(var(--primary))]/50"
+                                className="input-field bg-[hsl(var(--card-bg))]/50 border-[hsl(var(--border-color))] focus:border-[hsl(var(--primary))]/50 text-[hsl(var(--text-primary))]"
                                 placeholder="name@domain.com"
                                 required
                             />
@@ -76,13 +76,13 @@ export default function LoginPage() {
 
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">Password</label>
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--text-secondary))] opacity-60 ml-1">Password</label>
                             </div>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="input-field bg-white/5 border-white/10 focus:border-[hsl(var(--primary))]/50"
+                                className="input-field bg-[hsl(var(--card-bg))]/50 border-[hsl(var(--border-color))] focus:border-[hsl(var(--primary))]/50 text-[hsl(var(--text-primary))]"
                                 placeholder="••••••••"
                                 required
                             />
@@ -91,13 +91,13 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full btn-primary py-4 rounded-xl font-black tracking-widest uppercase shadow-xl shadow-[hsl(var(--primary))]/20 ring-1 ring-white/10 hover:scale-[1.02] transition-all disabled:opacity-50"
+                            className="w-full btn-primary py-4 rounded-xl font-black tracking-widest uppercase shadow-xl shadow-[hsl(var(--primary))]/20 border border-[hsl(var(--border-color))]/20 hover:scale-[1.02] transition-all disabled:opacity-50"
                         >
                             {loading ? 'Authenticating...' : 'Enter Console'}
                         </button>
                     </form>
 
-                    <div className="mt-8 pt-8 border-t border-white/5 text-center">
+                    <div className="mt-8 pt-8 border-t border-[hsl(var(--border-color))] text-center">
                         <p className="text-[hsl(var(--text-secondary))] text-[11px] font-bold">
                             Don&apos;t have an account? <a href="/signup" className="text-[hsl(var(--primary))] hover:underline">Request Access</a>
                         </p>
