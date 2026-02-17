@@ -82,6 +82,10 @@ export async function updateIntelligenceSource(source: IntelligenceSource): Prom
     await supabase.from('intelligence_sources').update(source).eq('id', source.id);
 }
 
+export async function deleteIntelligenceSource(id: string): Promise<void> {
+    await supabase.from('intelligence_sources').delete().eq('id', id);
+}
+
 export async function fetchDiscoveryLogs(): Promise<DiscoveryLog[]> {
     const { data, error } = await supabase.from('discovery_logs').select('*');
     if (error) return [];

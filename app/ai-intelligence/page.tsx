@@ -11,6 +11,7 @@ export default function AIIntelligencePage() {
     // Common State
     const [showSourceModal, setShowSourceModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [editingSource, setEditingSource] = useState<IntelligenceSource | null>(null);
 
     // Tool Form State
     const [toolName, setToolName] = useState('');
@@ -23,23 +24,44 @@ export default function AIIntelligencePage() {
     const handleAddSource = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+
         const newSource: IntelligenceSource = {
-            id: crypto.randomUUID(),
+            id: editingSource?.id || crypto.randomUUID(),
             name: formData.get('name') as string,
             url: formData.get('url') as string,
             description: formData.get('description') as string,
-            checkedThisWeek: false,
-            lastResetDate: new Date().toISOString()
+            checkedThisWeek: editingSource?.checkedThisWeek || false,
+            lastResetDate: editingSource?.lastResetDate || new Date().toISOString()
         };
 
-        await db.addIntelligenceSource(newSource);
+        if (editingSource) {
+            await db.updateIntelligenceSource(newSource);
+        } else {
+            await db.addIntelligenceSource(newSource);
+        }
+
         setShowSourceModal(false);
+        setEditingSource(null);
         loadAll();
     };
 
     const handleToggleSource = async (source: IntelligenceSource) => {
         await db.updateIntelligenceSource({ ...source, checkedThisWeek: !source.checkedThisWeek });
         loadAll();
+    };
+
+    const handleDeleteSource = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (confirm('Are you sure you want to delete this resource?')) {
+            await db.deleteIntelligenceSource(id);
+            loadAll();
+        }
+    };
+
+    const openEditModal = (source: IntelligenceSource, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setEditingSource(source);
+        setShowSourceModal(true);
     };
 
     const handleAddTool = async (e: React.FormEvent) => {
@@ -140,7 +162,7 @@ export default function AIIntelligencePage() {
                             <span className="text-xl">📡</span> Resources to Check
                         </h2>
                         <button
-                            onClick={() => setShowSourceModal(true)}
+                            onClick={() => { setEditingSource(null); setShowSourceModal(true); }}
                             className="w-8 h-8 rounded-lg bg-[hsl(var(--primary))]/10 border border-[hsl(var(--primary))]/20 flex items-center justify-center hover:bg-[hsl(var(--primary))]/20 hover:scale-105 active:scale-95 transition-all text-[hsl(var(--primary))]"
                             title="Add New Resource"
                         >
@@ -152,7 +174,7 @@ export default function AIIntelligencePage() {
                         {sources.map(source => (
                             <div
                                 key={source.id}
-                                className={`snap-start shrink-0 w-[280px] group card p-4 border transition-all cursor-pointer flex items-center justify-between ${source.checkedThisWeek
+                                className={`snap-start shrink-0 w-[280px] group card p-4 border transition-all cursor-pointer flex items-center justify-between relative overflow-hidden ${source.checkedThisWeek
                                     ? 'border-green-500/20 bg-green-500/5 opacity-50'
                                     : 'border-[hsl(var(--border-color))] hover:border-[hsl(var(--primary))]/30 bg-[hsl(var(--card-bg))]'
                                     }`}
@@ -166,9 +188,27 @@ export default function AIIntelligencePage() {
                                         <span className="text-[9px] opacity-60 text-[hsl(var(--text-secondary))] truncate">{source.description || 'Resource'}</span>
                                     </div>
                                 </div>
-                                <a href={source.url} target="_blank" onClick={e => e.stopPropagation()} className="p-1.5 opacity-20 hover:opacity-100 hover:text-[hsl(var(--primary))] text-[hsl(var(--text-primary))] transition-opacity">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
-                                </a>
+
+                                {/* Hover Actions */}
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => openEditModal(source, e)}
+                                        className="p-1.5 hover:bg-[hsl(var(--primary))]/10 rounded text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--primary))]"
+                                        title="Edit"
+                                    >
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                                    </button>
+                                    <button
+                                        onClick={(e) => handleDeleteSource(source.id, e)}
+                                        className="p-1.5 hover:bg-red-500/10 rounded text-[hsl(var(--text-secondary))] hover:text-red-500"
+                                        title="Delete"
+                                    >
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                                    </button>
+                                    <a href={source.url} target="_blank" onClick={e => e.stopPropagation()} className="p-1.5 hover:bg-[hsl(var(--primary))]/10 rounded text-[hsl(var(--text-secondary))] hover:text-[hsl(var(--primary))]">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                                    </a>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -299,28 +339,28 @@ export default function AIIntelligencePage() {
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
                     <div className="card p-10 w-full max-w-md border border-[hsl(var(--border-color))] shadow-2xl bg-[hsl(var(--card-bg))]">
                         <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-2xl font-black italic text-[hsl(var(--text-primary))]">Add New Resource</h3>
-                            <button onClick={() => setShowSourceModal(false)} className="w-10 h-10 rounded-xl bg-[hsl(var(--bg-dark))] flex items-center justify-center hover:bg-[hsl(var(--border-color))] transition-colors text-[hsl(var(--text-primary))]">✕</button>
+                            <h3 className="text-2xl font-black italic text-[hsl(var(--text-primary))]">{editingSource ? 'Edit Resource' : 'Add New Resource'}</h3>
+                            <button onClick={() => { setShowSourceModal(false); setEditingSource(null); }} className="w-10 h-10 rounded-xl bg-[hsl(var(--bg-dark))] flex items-center justify-center hover:bg-[hsl(var(--border-color))] transition-colors text-[hsl(var(--text-primary))]">✕</button>
                         </div>
                         <form onSubmit={handleAddSource} className="space-y-6">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black uppercase tracking-widest opacity-60 ml-1 text-[hsl(var(--text-secondary))]">Resource Name</label>
-                                <input name="name" placeholder="Name (e.g. TLDR AI, X @username)" className="input-field text-[hsl(var(--text-primary))]" required />
+                                <input name="name" defaultValue={editingSource?.name} placeholder="Name (e.g. TLDR AI, X @username)" className="input-field text-[hsl(var(--text-primary))]" required />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black uppercase tracking-widest opacity-60 ml-1 text-[hsl(var(--text-secondary))]">URL / Link</label>
-                                <input name="url" placeholder="https://..." className="input-field text-[hsl(var(--text-primary))]" required />
+                                <input name="url" defaultValue={editingSource?.url} placeholder="https://..." className="input-field text-[hsl(var(--text-primary))]" required />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black uppercase tracking-widest opacity-60 ml-1 text-[hsl(var(--text-secondary))]">Type</label>
-                                <select name="description" className="input-field text-[hsl(var(--text-primary))] bg-[hsl(var(--card-bg))] cursor-pointer">
+                                <select name="description" defaultValue={editingSource?.description} className="input-field text-[hsl(var(--text-primary))] bg-[hsl(var(--card-bg))] cursor-pointer">
                                     <option value="Website">Website / Newsletter</option>
                                     <option value="X Account">X (Twitter) Account</option>
                                     <option value="YouTube Channel">YouTube Channel</option>
                                     <option value="Other">Other</option>
                                 </select>
                             </div>
-                            <button type="submit" className="w-full btn-primary py-5 rounded-2xl font-black text-xs uppercase tracking-widest mt-4">Save Resource</button>
+                            <button type="submit" className="w-full btn-primary py-5 rounded-2xl font-black text-xs uppercase tracking-widest mt-4">{editingSource ? 'Update Resource' : 'Save Resource'}</button>
                         </form>
                     </div>
                 </div>
