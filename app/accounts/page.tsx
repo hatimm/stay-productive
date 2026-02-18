@@ -374,7 +374,7 @@ export default function AccountsPage() {
                                             🎯 Strategic node
                                         </div>
                                         <h2 className="text-3xl font-black tracking-tight">
-                                            {modalMode === 'add' ? 'Add New Account' : 'Manage Credentials'}
+                                            {modalMode === 'add' ? 'Add New Account' : 'Edit Account Details'}
                                         </h2>
                                     </div>
                                     <button
@@ -451,6 +451,13 @@ function AccountCard({
                     >
                         🔗
                     </a>
+                    <button
+                        onClick={() => onEdit(account)}
+                        className="w-8 h-8 rounded-lg bg-[hsl(var(--bg-dark))] flex items-center justify-center text-xs grayscale hover:grayscale-0 hover:bg-[hsl(var(--primary))]/10 hover:text-[hsl(var(--primary))] transition-all"
+                        title="Edit Account Details"
+                    >
+                        ✏️
+                    </button>
                     <button
                         onClick={() => onEdit(account)}
                         className="w-8 h-8 rounded-lg bg-[hsl(var(--bg-dark))] flex items-center justify-center text-xs grayscale hover:grayscale-0 hover:bg-[hsl(var(--primary))]/10 hover:text-[hsl(var(--primary))] transition-all"
@@ -660,10 +667,10 @@ function AccountForm({ type, initialData, mode, onClose }: AccountFormProps) {
             professionalCategory: currentType === 'Professional' ? professionalCategory : undefined,
             username,
             url,
-            email: email || undefined,
-            loginPassword: password || undefined,
-            credentialHint: hint || undefined,
-            notes: notes || undefined
+            email: email || '',
+            loginPassword: password || '',
+            credentialHint: hint || '',
+            notes: notes || ''
         };
 
         if (mode === 'edit' && initialData) {
