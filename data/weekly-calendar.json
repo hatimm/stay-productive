@@ -1,0 +1,296 @@
+{
+    "meta": {
+        "version": "1.0",
+        "description": "Weekly recurring task calendar for Stay Productive app",
+        "categories": [
+            "DevOps",
+            "Project",
+            "Freelancing",
+            "OnlinePresence",
+            "AINews",
+            "Lead",
+            "Portfolio",
+            "Reflection"
+        ],
+        "priorities": [
+            "high",
+            "medium",
+            "low"
+        ]
+    },
+    "week": {
+        "Monday": {
+            "focus": "Learning + Planning",
+            "tasks": [
+                {
+                    "title": "DevOps video 25-40 min + practice + notes",
+                    "description": "Watch a focused DevOps tutorial, replicate the steps in your lab, and take notes on key commands or pitfalls.",
+                    "category": "DevOps",
+                    "priority": "high",
+                    "estimatedMinutes": 60
+                },
+                {
+                    "title": "AI news scan 15-20 min → add to directory → draft post ideas",
+                    "description": "Quickly check feeds for new AI tools or agentic workflow updates. Add interesting ones to your directory and think of content ideas.",
+                    "category": "AINews",
+                    "priority": "high",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "Plan main project/automation focus for the week",
+                    "description": "Define the specific n8n automation or SaaS feature you will complete by Sunday. Set clear milestones.",
+                    "category": "Project",
+                    "priority": "medium",
+                    "estimatedMinutes": 30
+                },
+                {
+                    "title": "Review post ideas → schedule posts for week",
+                    "description": "Look at your idea backlog. Schedule at least 3 posts across X, LinkedIn, or Medium for the upcoming days.",
+                    "category": "OnlinePresence",
+                    "priority": "medium",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "X/Reddit engagement (2-3 replies)",
+                    "description": "Reply thoughtfully to current discussions in the DevOps, AI, or SaaS communities to build presence.",
+                    "category": "OnlinePresence",
+                    "priority": "low",
+                    "estimatedMinutes": 15
+                }
+            ]
+        },
+        "Tuesday": {
+            "focus": "Build + Publish",
+            "tasks": [
+                {
+                    "title": "Project work (n8n / SaaS) 1-2h",
+                    "description": "Deep work session on your primary project. Focus on logic building or UI implementation.",
+                    "category": "Project",
+                    "priority": "high",
+                    "estimatedMinutes": 120
+                },
+                {
+                    "title": "Push updates to GitHub",
+                    "description": "Commit your changes with clear messages. Maintain your streak and version history.",
+                    "category": "Project",
+                    "priority": "high",
+                    "estimatedMinutes": 10
+                },
+                {
+                    "title": "Draft X/Medium post from project progress",
+                    "description": "Share a screenshot or a lesson learned from today's build. Real-time building attracts more interest.",
+                    "category": "OnlinePresence",
+                    "priority": "medium",
+                    "estimatedMinutes": 25
+                },
+                {
+                    "title": "AI tool test → notes/mini review",
+                    "description": "Pick one tool from your scans. Test it for 10 minutes and write a quick pros/cons note.",
+                    "category": "AINews",
+                    "priority": "low",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "X/Reddit engagement (2-3 replies)",
+                    "description": "Provide value in comment sections. Help people solve problems related to automation or DevOps.",
+                    "category": "OnlinePresence",
+                    "priority": "low",
+                    "estimatedMinutes": 15
+                }
+            ]
+        },
+        "Wednesday": {
+            "focus": "Leads + Freelance",
+            "tasks": [
+                {
+                    "title": "DevOps video 25-40 min + practice + notes",
+                    "description": "Continue your learning path. Focus on practical implementation of infrastructure as code or CI/CD.",
+                    "category": "DevOps",
+                    "priority": "high",
+                    "estimatedMinutes": 60
+                },
+                {
+                    "title": "Run lead collection automation + manual leads",
+                    "description": "Trigger your lead scrapers and spend 15 minutes manually finding high-quality freelance leads.",
+                    "category": "Lead",
+                    "priority": "high",
+                    "estimatedMinutes": 30
+                },
+                {
+                    "title": "Send 3-5 proposals",
+                    "description": "Write personalized proposals for the leads found. Focus on showcasing your automation expertise.",
+                    "category": "Freelancing",
+                    "priority": "high",
+                    "estimatedMinutes": 60
+                },
+                {
+                    "title": "Engage online: reply 2-3 X/Reddit posts",
+                    "description": "Maintain consistency in engagement. Look for people asking for automation or freelance help.",
+                    "category": "OnlinePresence",
+                    "priority": "medium",
+                    "estimatedMinutes": 15
+                }
+            ]
+        },
+        "Thursday": {
+            "focus": "Build + Content",
+            "tasks": [
+                {
+                    "title": "Continue project (n8n / SaaS)",
+                    "description": "Keep the momentum. Fix bugs or start the next sub-feature planned on Monday.",
+                    "category": "Project",
+                    "priority": "high",
+                    "estimatedMinutes": 120
+                },
+                {
+                    "title": "GitHub push",
+                    "description": "Daily commit. Ensure your repo reflects today's progress.",
+                    "category": "Project",
+                    "priority": "high",
+                    "estimatedMinutes": 10
+                },
+                {
+                    "title": "Draft project-based post",
+                    "description": "Create a thread or post about a specific technical challenge you solved in your project today.",
+                    "category": "OnlinePresence",
+                    "priority": "medium",
+                    "estimatedMinutes": 25
+                },
+                {
+                    "title": "Optional AI tool practice",
+                    "description": "If you have extra energy, dive deeper into a new AI agent framework or automation node.",
+                    "category": "AINews",
+                    "priority": "low",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "X/Reddit engagement (2-3 replies)",
+                    "description": "Strengthen relationships by replying to key influencers or active community members.",
+                    "category": "OnlinePresence",
+                    "priority": "low",
+                    "estimatedMinutes": 15
+                }
+            ]
+        },
+        "Friday": {
+            "focus": "Reflect + Portfolio",
+            "tasks": [
+                {
+                    "title": "DevOps video + practice + notes",
+                    "description": "Wrap up the week's learning module. Ensure you can explain the core concept without looking at notes.",
+                    "category": "DevOps",
+                    "priority": "high",
+                    "estimatedMinutes": 60
+                },
+                {
+                    "title": "Weekly reflection draft (post/blog)",
+                    "description": "Use the auto-generated summary to write a \"Week in Review\" post. Highlight wins and lessons.",
+                    "category": "Reflection",
+                    "priority": "high",
+                    "estimatedMinutes": 30
+                },
+                {
+                    "title": "Portfolio update",
+                    "description": "Add a new project screenshot, update a description, or refine a skill tag in your portfolio.",
+                    "category": "Portfolio",
+                    "priority": "medium",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "Freelance follow-ups",
+                    "description": "Ping leads from Monday/Wednesday if they haven't replied. Be professional and brief.",
+                    "category": "Freelancing",
+                    "priority": "medium",
+                    "estimatedMinutes": 15
+                },
+                {
+                    "title": "X/Reddit engagement (2-3 replies)",
+                    "description": "Final engagement pulse for the work week.",
+                    "category": "OnlinePresence",
+                    "priority": "low",
+                    "estimatedMinutes": 15
+                }
+            ]
+        },
+        "Saturday": {
+            "focus": "Freelance Push",
+            "tasks": [
+                {
+                    "title": "Send 3-5 proposals",
+                    "description": "Batch process new opportunities for the coming week while competition is lower.",
+                    "category": "Freelancing",
+                    "priority": "high",
+                    "estimatedMinutes": 60
+                },
+                {
+                    "title": "Review/tag leads",
+                    "description": "Organize your CRM. Tag leads by potential value and niche for easier follow-ups.",
+                    "category": "Lead",
+                    "priority": "medium",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "Optional small project tweaks",
+                    "description": "Do the non-essential but nice-to-have polishing on your projects.",
+                    "category": "Project",
+                    "priority": "low",
+                    "estimatedMinutes": 30
+                },
+                {
+                    "title": "Quick post/learning snippet",
+                    "description": "Share a Saturday thought or a quick tip you picked up during the week.",
+                    "category": "OnlinePresence",
+                    "priority": "low",
+                    "estimatedMinutes": 15
+                },
+                {
+                    "title": "Check freelance messages",
+                    "description": "Quick scan of Upwork/LinkedIn for any urgent weekend inquiries.",
+                    "category": "Freelancing",
+                    "priority": "medium",
+                    "estimatedMinutes": 10
+                }
+            ]
+        },
+        "Sunday": {
+            "focus": "Plan + Rest",
+            "tasks": [
+                {
+                    "title": "Plan next week's focus",
+                    "description": "Come up with the main project idea for the week and prepare the necessary resources or tools.",
+                    "category": "Project",
+                    "priority": "medium",
+                    "estimatedMinutes": 30
+                },
+                {
+                    "title": "AI news scan → add post ideas",
+                    "description": "Catch up on the latest AI trends and newsletters. Capture at least 2-3 content ideas for the week.",
+                    "category": "AINews",
+                    "priority": "medium",
+                    "estimatedMinutes": 20
+                },
+                {
+                    "title": "Portfolio check",
+                    "description": "Quickly review your portfolio link, check for dead links, and ensure your latest work is highlighted.",
+                    "category": "Portfolio",
+                    "priority": "low",
+                    "estimatedMinutes": 15
+                },
+                {
+                    "title": "Optional light learning/side project",
+                    "description": "Dive into a new tool or minor project feature only if you feel inspired. No pressure.",
+                    "category": "DevOps",
+                    "priority": "low",
+                    "estimatedMinutes": 30
+                },
+                {
+                    "title": "Rest & recharge",
+                    "description": "Completely disconnect from work. Focus on recovery to maintain long-term momentum.",
+                    "category": "OnlinePresence",
+                    "priority": "low",
+                    "estimatedMinutes": 0
+                }
+            ]
+        }
+    }
+}

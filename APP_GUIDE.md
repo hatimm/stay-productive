@@ -36,7 +36,7 @@ Welcome to your personal productivity command center. This document explains eve
 - **Theme Engine**: A robust **Light/Dark Mode** switcher.
     - **Light Mode**: Professional, high-contrast, paper-white aesthetic with true black text.
     - **Dark Mode**: Deep midnight blues (`slate-950`) for focus and reduced eye strain.
-- **Responsive Sidebar**: Quick-access navigation to Hub, Calendar, Notes, AI Tracker, and Settings from any page.
+- **Responsive Sidebar**: Quick-access navigation to Hub, Calendar, Notes, AI Tracker, Accounts, Documents, Task Chains, and Tutorial from any page.
 
 ### 5. **Freelance Client Mode** 🤝
 - **Client Active Toggle**: A dedicated switch in the header for when you have an active contract.
@@ -45,16 +45,17 @@ Welcome to your personal productivity command center. This document explains eve
 
 ---
 
-### 6. **AI Tracker** 🧠 (New!)
+### 6. **AI Tracker** 🧠
+
 A dedicated command center for staying ahead of the AI curve.
 
-#### **Resources to Check** (Sidebar)
-- **Purpose**: Your daily "check-in" list for high-value intelligence (Newsletters, X Accounts, YouTube Channels).
+#### **Resources to Check** (Horizontal Ticker)
+- **Purpose**: Your weekly "check-in" list for high-value intelligence (Newsletters, X Accounts, YouTube Channels).
+- **Horizontal Ticker**: Resources are displayed as scrollable cards at the top of the page for quick access.
 - **Weekly Reset**: Toggle items as you check them. They automatically uncheck next week.
-- **Add New Resource**: Click the prominent **`+`** button to open a modal where you can add:
-    - **Name**: e.g., "TLDR AI"
-    - **URL**: Direct link to the source.
-    - **Type**: Select from a dropdown (`Website`, `X Account`, `YouTube`, `Other`).
+- **Add New Resource**: Click the **`+`** button to open a modal and add a resource (Name, URL, Type).
+- **Edit Resource**: Hover over any card and click the **pencil icon (✏️)** to update its name, URL, or type.
+- **Delete Resource**: Hover over any card and click the **trash icon** to permanently remove it (with confirmation).
 
 #### **Quick Tool Capture** ⚡
 - **Purpose**: Instantly save a new AI tool you discover without breaking flow.
@@ -82,16 +83,43 @@ A dedicated command center for staying ahead of the AI curve.
 - **Credentials**: Store Diplomas and Vendor Certifications (AWS, Docker, etc.).
 - **Interactive Management**: Upload, download, and delete files instantly.
 
+### 9. **Accounts Manager** 🔑
+- **Purpose**: Centralize all your platform credentials and social accounts in one secure place.
+- **Three Sections**: Accounts are organized into **Social Media**, **Professional** (freelance platforms), and **Opportunities & Portals** (job boards).
+- **Credential Storage**: Store username, email, password, and a credential hint for each account.
+- **Edit Credentials**: Click the **pencil icon (✏️)** on any account card to update all fields in an edit modal pre-filled with existing data.
+- **Delete Account**: Click the **×** button (visible on hover) to remove an account after confirmation.
+- **Activity Counters**: Increment/decrement post counts, proposal counts, and application counts directly from each card.
+- **Credential Reveal**: Click the 👁️ icon to temporarily show a hidden password.
+
+### 10. **Task Chains** ⛓️ *(New)*
+- **Purpose**: A strategic reference page that documents your three core operating systems.
+- **Three Master Chains**:
+    - 🟣 **Authority Engine** — How you build online visibility through testing tools and posting insights.
+    - 🟢 **Asset Engine** — How you build deep DevOps skills through structured learning (private, no posting).
+    - 🟡 **Revenue Engine** — How you turn skills into freelance income through leads and proposals.
+- **Interactive Execution Tracker**: Click **"Track Today →"** to access a live dashboard at `/task-chains/tracking` that:
+    - Automatically calculates your progress based on completed tasks and notes.
+    - Tracks Authority (AINews/Social), Asset (DevOps notes/tasks), and Revenue (Leads/Proposals).
+    - Visualizes your last 7 days of strategic alignment.
+    - Shows a "Full Strategic Day" 🔥 achievement when all 3 engines hit 100%.
+- **Step-by-Step Workflows**: Each chain is broken into numbered step blocks with short, practical descriptions.
+- **Strategic Connection**: A section showing how all 3 chains feed each other (Authority → Revenue → Asset → Authority).
+- **Weekly Alignment Table**: Maps each day of the week to the chains it activates, with color-coded indicators.
+
 ---
 
 ## ⚙️ Data & Architecture
 
 ### **Cloud-Native Backend (Supabase)** ☁️
 Unlike the previous local-only version, **VibeCode OS** is now fully cloud-enabled.
-- **Database**: All data (Tasks, Notes, Tools, Resources) is stored in a secure Postgres database via Supabase.
+- **Database**: All data (Tasks, Notes, Tools, Resources, Accounts) is stored in a secure Postgres database via Supabase.
 - **Real-Time Sync**: Changes to tasks or notes are saved instantly to the cloud.
 - **Authentication**: Secure email/password login system protects your data.
 - **Device Agnostic**: Log in from any device to access your productivity workspace.
+
+### **Reference Data Files**
+- **`data/weekly-calendar.json`**: A structured JSON export of your full weekly recurring task schedule. Contains all 7 days, each with a focus theme, task list, categories, priorities, and estimated time per task. Useful for seeding data or integrating with external tools.
 
 ### **Reliability**
 - **UUID Generation**: All new entries generate a unique ID on the client-side before sync, ensuring zero conflicts and robust data capabilities.
@@ -103,6 +131,8 @@ Unlike the previous local-only version, **VibeCode OS** is now fully cloud-enabl
 - **Master the Routine**: The "Expansion" zone stays locked until your daily routine is 100% complete. Master the basics first.
 - **Capture Everything**: Use the **AI Tracker** to dump raw inputs (URLs, Tools) so you can process them later in your Dashboard tasks.
 - **Timestamped Knowledge**: When watching DevOps videos, add notes with timestamps (e.g., `12:45`) to jump back to key concepts later.
+- **Review Task Chains**: Visit the **Task Chains** page weekly to realign your daily work with the 3 strategic systems.
+- **Keep Accounts Updated**: Use the Accounts Manager to store credentials so you never lose access to a platform mid-outreach.
 
 ---
 *VibeCode OS. Build the Future.*

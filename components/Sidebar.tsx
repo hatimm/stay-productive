@@ -14,6 +14,14 @@ const NAV_ITEMS = [
     { name: "Notes", href: "/notes", icon: "📓" },
     { name: "Accounts", href: "/accounts", icon: "🔑" },
     { name: "Documents", href: "/documents", icon: "📁" },
+    {
+        name: "Task Chains",
+        href: "/task-chains",
+        icon: "⛓️",
+        subItems: [
+            { name: "Live Tracking", href: "/task-chains/tracking", icon: "⚡" }
+        ]
+    },
     { name: "Tutorial", href: "/tutorial", icon: "📚" },
 ];
 
@@ -36,23 +44,48 @@ export default function Sidebar() {
                 <nav className="space-y-1">
                     {NAV_ITEMS.map((item) => {
                         const isActive = pathname === item.href;
+                        const isChildActive = item.subItems?.some(sub => pathname === sub.href);
+                        const isSectionActive = isActive || isChildActive;
+
                         return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all group ${isActive
-                                    ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]"
-                                    : "text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-dark))] hover:text-[hsl(var(--text-primary))]"
-                                    }`}
-                            >
-                                <span className={`text-lg transition-transform group-hover:scale-110 duration-200 ${isActive ? "" : "grayscale"}`}>
-                                    {item.icon}
-                                </span>
-                                {item.name}
-                                {isActive && (
-                                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[hsl(var(--primary))]" />
+                            <div key={item.href} className="space-y-1">
+                                <Link
+                                    href={item.href}
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all group ${isActive
+                                        ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]"
+                                        : "text-[hsl(var(--text-secondary))] hover:bg-[hsl(var(--bg-dark))] hover:text-[hsl(var(--text-primary))]"
+                                        }`}
+                                >
+                                    <span className={`text-lg transition-transform group-hover:scale-110 duration-200 ${isActive ? "" : "grayscale"}`}>
+                                        {item.icon}
+                                    </span>
+                                    {item.name}
+                                    {isActive && (
+                                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[hsl(var(--primary))]" />
+                                    )}
+                                </Link>
+
+                                {isSectionActive && item.subItems && (
+                                    <div className="ml-9 border-l border-[hsl(var(--border-color))] space-y-1 py-1">
+                                        {item.subItems.map(sub => {
+                                            const isSubActive = pathname === sub.href;
+                                            return (
+                                                <Link
+                                                    key={sub.href}
+                                                    href={sub.href}
+                                                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold transition-all rounded-lg mx-2 ${isSubActive
+                                                        ? "text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/5"
+                                                        : "text-[hsl(var(--text-muted))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--bg-dark))]"
+                                                        }`}
+                                                >
+                                                    <span>{sub.icon}</span>
+                                                    {sub.name}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
                                 )}
-                            </Link>
+                            </div>
                         );
                     })}
                 </nav>
