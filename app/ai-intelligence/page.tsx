@@ -128,7 +128,7 @@ export default function AIIntelligencePage() {
             category: 'AINews',
             priority: 'medium',
             completed: false,
-            isSubTask: false,
+            isSubTask: true,
             date: today,
             createdAt: new Date().toISOString()
         } as Task);
@@ -136,6 +136,13 @@ export default function AIIntelligencePage() {
         setNewsText('');
         setIsSubmitting(false);
         loadAll();
+    };
+
+    const handleDeleteLog = async (id: string) => {
+        if (confirm('Are you sure you want to delete this log entry?')) {
+            await db.deleteDiscoveryLog(id);
+            loadAll();
+        }
     };
 
     return (
@@ -304,7 +311,7 @@ export default function AIIntelligencePage() {
                                 {logs.map(log => {
                                     const isTool = log.category === 'Tool';
                                     return (
-                                        <div key={log.id} className={`card p-4 border transition-all ${isTool ? 'border-[hsl(var(--primary))]/10 bg-[hsl(var(--primary))]/5' : 'border-[hsl(var(--border-color))]'}`}>
+                                        <div key={log.id} className={`group card p-4 border transition-all relative overflow-hidden ${isTool ? 'border-[hsl(var(--primary))]/10 bg-[hsl(var(--primary))]/5' : 'border-[hsl(var(--border-color))]'}`}>
                                             <div className="flex items-start gap-3">
                                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0 ${isTool ? 'bg-[hsl(var(--primary))]/10' : 'bg-[hsl(var(--bg-dark))]'}`}>
                                                     {isTool ? '🧰' : '📰'}
@@ -316,7 +323,7 @@ export default function AIIntelligencePage() {
                                                         </span>
                                                         <span className="text-[8px] font-bold opacity-40 text-[hsl(var(--text-muted))]">{new Date(log.createdAt).toLocaleDateString()}</span>
                                                     </div>
-                                                    <h4 className="font-bold text-sm text-[hsl(var(--text-primary))] truncate">
+                                                    <h4 className="font-bold text-sm text-[hsl(var(--text-primary))] truncate pr-6">
                                                         {log.link ? <a href={log.link} target="_blank" className="hover:underline flex items-center gap-2">
                                                             {log.title}
                                                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-30"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
@@ -325,6 +332,15 @@ export default function AIIntelligencePage() {
                                                     <p className="text-[11px] opacity-70 text-[hsl(var(--text-secondary))] truncate mt-0.5 max-w-[95%]">{log.summary}</p>
                                                 </div>
                                             </div>
+
+                                            {/* Log Delete Button */}
+                                            <button
+                                                onClick={() => handleDeleteLog(log.id)}
+                                                className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/10 rounded text-red-500 transition-all active:scale-90"
+                                                title="Delete entry"
+                                            >
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                                            </button>
                                         </div>
                                     );
                                 })}

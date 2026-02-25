@@ -87,13 +87,20 @@ export async function deleteIntelligenceSource(id: string): Promise<void> {
 }
 
 export async function fetchDiscoveryLogs(): Promise<DiscoveryLog[]> {
-    const { data, error } = await supabase.from('discovery_logs').select('*');
+    const { data, error } = await supabase
+        .from('discovery_logs')
+        .select('*')
+        .order('createdAt', { ascending: false });
     if (error) return [];
     return data || [];
 }
 
 export async function addDiscoveryLog(log: DiscoveryLog): Promise<void> {
     await supabase.from('discovery_logs').insert(log);
+}
+
+export async function deleteDiscoveryLog(id: string): Promise<void> {
+    await supabase.from('discovery_logs').delete().eq('id', id);
 }
 
 // --- DELETES ---
