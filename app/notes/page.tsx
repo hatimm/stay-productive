@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useProductivity } from '@/hooks/useVibeCode';
-import { NoteType } from '@/lib/models';
+import { NoteType, Note } from '@/lib/models';
 import * as db from '@/lib/db';
 
 export default function NotesPage() {
