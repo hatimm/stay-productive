@@ -23,7 +23,7 @@ export default function ProjectsPage() {
         const formData = new FormData(e.currentTarget);
 
         const newProject: Project = {
-            id: editingProject?.id || '', // DB will generate if empty
+            id: editingProject?.id || crypto.randomUUID(),
             name: formData.get('name') as string,
             type: formData.get('type') as ProjectType,
             status: formData.get('status') as ProjectStatus,
@@ -41,9 +41,7 @@ export default function ProjectsPage() {
         if (editingProject) {
             await db.updateProject(newProject);
         } else {
-            // @ts-expect-error - remove ID to let DB generate it
-            delete newProject.id;
-            await db.addProject(newProject as Project);
+            await db.addProject(newProject);
         }
 
         setIsModalOpen(false);

@@ -159,12 +159,44 @@ export async function deleteDocument(id: string): Promise<void> {
 export async function fetchVideoProgress(): Promise<VideoProgress[]> {
     const { data, error } = await supabase.from('video_progress').select('*');
     if (error) return [];
-    return data || [];
+    return (data || []).map(item => ({
+        videoId: item.videoId,
+        minutesWatched: item.minutesWatched,
+        completed: item.completed,
+        lastWatched: item.lastUpdated
+    }));
 }
 
 export async function saveVideoProgress(progress: VideoProgress): Promise<void> {
-    const { error } = await supabase.from('video_progress').upsert(progress, { onConflict: 'videoId' });
-    if (error) console.error('Error saving video progress:', error);
+    const { data: existing } = await supabase
+        .from('video_progress')
+        .select('*')
+        .eq('videoId', progress.videoId)
+        .single();
+
+    if (existing) {
+        const dbRecord = {
+            minutesWatched: progress.minutesWatched,
+            completed: progress.completed,
+            lastUpdated: progress.lastWatched
+        };
+        const { error } = await supabase
+            .from('video_progress')
+            .update(dbRecord)
+            .eq('videoId', progress.videoId);
+        if (error) console.error('Error updating video progress:', error.message, error.details);
+    } else {
+        const dbRecord = {
+            videoId: progress.videoId,
+            minutesWatched: progress.minutesWatched,
+            completed: progress.completed,
+            lastUpdated: progress.lastWatched
+        };
+        const { error } = await supabase
+            .from('video_progress')
+            .insert(dbRecord);
+        if (error) console.error('Error inserting video progress:', error.message, error.details);
+    }
 }
 
 // --- MIGRATION HELPERS ---
