@@ -209,6 +209,17 @@ export async function deleteNote(noteId: string): Promise<void> {
     if (error) console.error('Error deleting note:', error);
 }
 
+export async function updateNote(note: Note): Promise<void> {
+    const { error } = await supabase.from('notes').update({
+        content: note.content,
+        type: note.type,
+        videoName: note.videoName,
+        timestamp: note.timestamp,
+        taskId: note.taskId
+    }).eq('id', note.id);
+    if (error) console.error('Error updating note:', error);
+}
+
 // --- MIGRATION HELPER ---
 // --- MIGRATION HELPER ---
 export async function migrateData(

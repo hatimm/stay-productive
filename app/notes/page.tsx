@@ -10,6 +10,7 @@ export default function NotesPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<NoteType | 'All'>('All');
     const [showAddForm, setShowAddForm] = useState(false);
+    const [editingNote, setEditingNote] = useState<Note | null>(null);
 
     if (!isLoaded) {
         return (
@@ -136,6 +137,13 @@ export default function NotesPage() {
                                         >
                                             Delete
                                         </button>
+                                        
+                                        <button
+                                            onClick={() => setEditingNote(note)}
+                                            className="absolute top-4 right-20 opacity-0 group-hover:opacity-100 p-2 text-[10px] uppercase font-bold text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 rounded-lg transition-all hover:bg-[hsl(var(--primary))]/20"
+                                        >
+                                            Edit
+                                        </button>
 
                                         <div className="flex justify-between items-start mb-6">
                                             <div className="flex items-center gap-3">
@@ -213,15 +221,39 @@ export default function NotesPage() {
                     </div>
                 </div>
             )}
+
+            {/* Edit Modal Overlay */}
+            {editingNote && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[hsl(var(--bg-dark))]/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-[hsl(var(--card-bg))] w-full max-w-4xl rounded-[32px] border border-[hsl(var(--border-color))] shadow-2xl relative animate-in zoom-in-95 duration-300 overflow-hidden">
+                        <div className="px-8 pt-8 pb-4">
+                            <button
+                                onClick={() => setEditingNote(null)}
+                                className="absolute top-8 right-8 w-10 h-10 flex items-center justify-center rounded-xl bg-[hsl(var(--bg-dark))] hover:bg-[hsl(var(--border-color))] transition-colors text-2xl"
+                                aria-label="Close"
+                            >
+                                ×
+                            </button>
+                            <CategorizedNoteForm
+                                note={editingNote}
+                                onClose={() => {
+                                    setEditingNote(null);
+                                    loadAll();
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
-function CategorizedNoteForm({ onClose }: { onClose: () => void }) {
-    const [type, setType] = useState<NoteType>('General');
-    const [content, setContent] = useState('');
-    const [videoName, setVideoName] = useState('');
-    const [timestamp, setTimestamp] = useState('');
+function CategorizedNoteForm({ onClose, note }: { onClose: () => void; note?: Note }) {
+    const [type, setType] = useState<NoteType>(note?.type || 'General');
+    const [content, setContent] = useState(note?.content || '');
+    const [videoName, setVideoName] = useState(note?.videoName || '');
+    const [timestamp, setTimestamp] = useState(note?.timestamp || '');
 
     const noteTypes: { type: NoteType; label: string; icon: string }[] = [
         { type: 'AppIdea', label: 'App ideas', icon: '💡' },
@@ -237,14 +269,24 @@ function CategorizedNoteForm({ onClose }: { onClose: () => void }) {
         e.preventDefault();
         if (!content.trim()) return;
 
-        await db.addNote({
-            id: crypto.randomUUID(),
-            content: content.trim(),
-            type,
-            videoName: type === 'DevOps' ? videoName : undefined,
-            timestamp: type === 'DevOps' ? timestamp : undefined,
-            createdAt: new Date().toISOString()
-        });
+        if (note) {
+            await db.updateNote({
+                ...note,
+                content: content.trim(),
+                type,
+                videoName: type === 'DevOps' ? videoName : undefined,
+                timestamp: type === 'DevOps' ? timestamp : undefined,
+            });
+        } else {
+            await db.addNote({
+                id: crypto.randomUUID(),
+                content: content.trim(),
+                type,
+                videoName: type === 'DevOps' ? videoName : undefined,
+                timestamp: type === 'DevOps' ? timestamp : undefined,
+                createdAt: new Date().toISOString()
+            });
+        }
 
         onClose();
     };
@@ -252,8 +294,8 @@ function CategorizedNoteForm({ onClose }: { onClose: () => void }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             <div className="text-center">
-                <h2 className="text-3xl font-black tracking-tight">Capture Insight</h2>
-                <p className="text-[hsl(var(--text-secondary))] mt-1">Select taxonomy and articulate your thought.</p>
+                <h2 className="text-3xl font-black tracking-tight">{note ? 'Refine Insight' : 'Capture Insight'}</h2>
+                <p className="text-[hsl(var(--text-secondary))] mt-1">{note ? 'Update your thought.' : 'Select taxonomy and articulate your thought.'}</p>
             </div>
 
             <div className="space-y-6">
@@ -339,7 +381,7 @@ function CategorizedNoteForm({ onClose }: { onClose: () => void }) {
                     type="submit"
                     className="h-14 bg-[hsl(var(--primary))] text-white rounded-2xl transition-all font-bold uppercase text-xs tracking-widest shadow-lg shadow-[hsl(var(--primary))]/20 hover:scale-[1.02]"
                 >
-                    Commit Note
+                    {note ? 'Save Changes' : 'Commit Note'}
                 </button>
             </footer>
         </form>
